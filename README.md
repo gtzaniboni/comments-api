@@ -1,66 +1,59 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Laravel comments api
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. Assumptions \
+1.1 There are only one blog post. So, the route will not expect blog/{id}/comments for simplicity, only /comments \
+1.2 Do not uses ORM. So, I choose uses only raw SQL. 
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+2. Comments and decisions \
+2.1 I created the database and tables using raw SQL too. of course, migrate is not eloquent, but I prefer do it myself. \
+2.2 There are at least 4 ways to nested registers in sql databases. All these ways have benefits. Due the requirement of only 3 levels, the SQL approach is select each level to mount easyly the json output. Using left join and get all information in just one query is, in the real, like make separated querys, but have more complexity in the response json fill process. \
+2.3 Delete one comment will delete all child. there are some different approachs, like "up" the childs or if the deleted comment have children, just delete the content. for simplicity, I just delete all child. \
+2.4 I dont make all tests. I just put one test to show how to do. Even in this single test, I check only the json structure. In a real world, needs to check all requirements, like the maximum level or bad values passed to create/update/delete. The main idea is show that first the tests needs to be developed BEFORE start to develop the api itself. \
+-- execute: php artisan test    and get FAIL! Develop the API and get it PASS! \
+2.5 I do not clean the stuff laravel put in the code. I left the unit test, ExampleTest, sail stuff, etc.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+3. Time \
+3.1 I plan expend about 4 hours to execute the activity\
+3.2 I used about 6 hours, because I have some issue with databases, sail, and my local setup. 
 
-## Learning Laravel
+4. Database and tables
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+For this particular example, create a database and table, and fill it. \
+In real world, use migration to do that. 
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+CREATE USER 'comments'@'%' IDENTIFIED WITH mysql_native_password AS '***';GRANT ALL PRIVILEGES ON *.* TO 'comments'@'%' REQUIRE NONE WITH GRANT OPTION MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;CREATE DATABASE IF NOT EXISTS `comments`;GRANT ALL PRIVILEGES ON `comments`.* TO 'comments'@'%';GRANT ALL PRIVILEGES ON `comments\_%`.* TO 'comments'@'%';
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+DROP TABLE comment; 
 
-## Laravel Sponsors
+CREATE TABLE comment(
+comment_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(60),
+parent_id INT UNSIGNED DEFAULT NULL,
+comment TEXT,
+FOREIGN KEY fk_parent(parent_id)
+REFERENCES comment(comment_id)   
+ON UPDATE CASCADE
+ON DELETE CASCADE);
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 1', NULL, 'coment 1');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 2', NULL, 'coment 2');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 3', 1, 'coment 3');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 4', 1, 'coment 4');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 5', NULL, 'coment 5');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 6', 3, 'coment 6');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 7', 3, 'coment 7');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 8', NULL, 'coment 8');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 9', 7, 'coment 9');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 10', 1, 'coment 10');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 11', NULL, 'coment 11');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 12', 10, 'coment 12');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 13', 10, 'coment 13');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 14', 12, 'coment 14');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 15', NULL, 'coment 15');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 16', 14, 'coment 16');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 17', NULL, 'coment 17');
+INSERT INTO `comment` (`comment_id`, `name`, `parent_id`, `comment`) VALUES (NULL, 'nome 18', 1, 'coment 18');
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
