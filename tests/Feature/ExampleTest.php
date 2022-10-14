@@ -70,7 +70,15 @@ class ExampleTest extends TestCase
     }
     public function test_api_request_create_new_comment()
     {
-        $response = $this->putJson('/api/comments/', ['name'=>'Teste', 'comment'=>'teste comment', 'parent_id'=>'1']);
+        $response = $this->putJson('/api/comments/', ['name'=>'Teste', 'comment'=>'teste comment']);
+ 
+        $response
+            ->assertStatus(200);
+    }
+
+    public function test_api_request_create_new_comment_with_parent()
+    {
+        $response = $this->putJson('/api/comments/', ['name'=>'Teste', 'comment'=>'teste comment', 'parent_id'=>1]);
  
         $response
             ->assertStatus(200);
@@ -78,7 +86,7 @@ class ExampleTest extends TestCase
 
     public function test_api_request_update_comment()
     {
-        $response = $this->putJson('/api/comments/{id}/', ['name'=>'Teste', 'comment'=>'teste comment']);
+        $response = $this->putJson('/api/comments/1/', ['name'=>'Teste novo', 'comment'=>'teste comment']);
  
         $response
             ->assertStatus(200);

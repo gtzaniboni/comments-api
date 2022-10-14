@@ -79,7 +79,7 @@ class Controller extends BaseController
 
 // I used Hand made SELECT here! in the other classes, uses insert/update from DB::table
 
-        $root = DB::select('SELECT comment_id as id, name, comment as message from comment WHERE parent_id IS NULL;');
+        $root = DB::select('SELECT comment_id as id, name, comment as message from comment WHERE (parent_id IS NULL OR parent_id=0);');
 
         foreach ($root as $i => $r)
         {
@@ -134,7 +134,7 @@ class Controller extends BaseController
     }
     public function store(Request $request)
     {
-
+        
         $r = DB::table('comment')->insert(
         ['name' => $request->name, 'parent_id' => $request->parent_id, 'comment' => $request->comment]);
 
