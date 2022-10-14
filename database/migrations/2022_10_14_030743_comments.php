@@ -18,7 +18,7 @@ return new class extends Migration
             $table->increments('comment_id'); 
             $table->string('name', 40);
             $table->string('comment', 255);
-            $table->integer('parent_id')->unsigned();   
+            $table->integer('parent_id')->unsigned()->nullable();   
             $table->index('comment_id');          
             $table->foreign('parent_id')->references('comment_id')->on('comment')->onUpdate('cascade')->onDelete('cascade');            
         });
